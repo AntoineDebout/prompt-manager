@@ -14,7 +14,7 @@ class PromptController extends Controller
     public function index()
     {
         return Inertia::render('Prompt/Index', [
-            'templatePrompt' => $this->getPromptService->getDefaultPromptTemplate(),
+            'templatePrompts' => $this->getPromptService->getPromptsOrderedBySlug(),
         ]);
     }
 }

@@ -1,19 +1,17 @@
 <template>
-  <div class="w-1/4">
-    <div class="bg-white rounded-lg border border-gray-200 p-4 sticky top-8">
-      <h2 class="text-lg font-medium text-gray-700 mb-3">Variables disponibles</h2>
-      <div class="flex flex-wrap gap-2">
-        <div
-          v-for="variable in availableVariables"
-          :key="variable.key"
-          class="px-3 py-1.5 bg-primary-50 text-primary-700 rounded-md border border-primary-200 cursor-pointer select-none"
-          draggable="true"
-          @dragstart="handleDragStart($event, variable)"
-          @dblclick="$emit('variable-click', variable)"
-        >
-          {{ variable.label }}
-        </div>
-      </div>
+  <div class="bg-white rounded-lg border border-gray-200 p-4">
+    <h2 class="text-lg font-medium text-gray-700 mb-3">Variables disponibles</h2>
+    <div class="flex flex-col gap-2">
+      <button
+        v-for="variable in availableVariables"
+        :key="variable.key"
+        class="px-3 py-2 text-sm text-gray-700 bg-white hover:bg-gray-50 rounded border border-gray-300 cursor-pointer text-center transition-colors duration-150 ease-in-out"
+        draggable="true"
+        @dragstart="handleDragStart($event, variable)"
+        @dblclick="$emit('variable-click', variable)"
+      >
+        {{ variable.label }}
+      </button>
     </div>
   </div>
 </template>

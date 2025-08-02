@@ -4,7 +4,15 @@ namespace App\Services;
 
 class GetPromptService
 {
-    public function getDefaultPromptTemplate(): array
+    public function getPromptsOrderedBySlug(): array
+    {
+        return [
+            '2025-08-03_first_prompt' => $this->getFirstPromptTemplate(),
+            '2025-08-03_second_prompt' => $this->getSecondPromptTemplate(),
+        ];
+    }
+
+    private function getFirstPromptTemplate(): array
     {
         return [
             [
@@ -49,5 +57,19 @@ class GetPromptService
                 'content' => '{{user_input}}',
             ],
         ];
+    }
+
+    private function getSecondPromptTemplate(): array
+    {
+        return [
+            [
+                'role' => 'system',
+                'content' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'
+            ],
+            [
+                'role' => 'user',
+                'content' => '{{user_input}}',
+            ],
+        ]; 
     }
 }
