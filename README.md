@@ -1,52 +1,110 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Gestionnaire de Prompts
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Une application construite avec Laravel, Vue.js et Tailwind CSS pour gérer et organiser vos prompts d'IA de manière efficace.
 
-## About Laravel
+## 🌟 Fonctionnalités
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- **Gestion Multi-prompts**
+  - Organisation de plusieurs prompts via un sélecteur intuitif
+  - Chaque prompt peut contenir plusieurs messages
+  - Prise en charge des rôles différents (system, user, assistant)
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- **Édition Interactive**
+  - Interface drag-and-drop pour réorganiser les messages
+  - Édition en temps réel avec auto-redimensionnement des zones de texte
+  - Boutons de déplacement haut/bas pour une navigation facile
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- **Variables Dynamiques**
+  - Insertion facile de variables prédéfinies
+  - Protection des variables insérées contre les modifications partielles
+  - Panneau latéral avec liste organisée des variables disponibles
 
-## Learning Laravel
+- **Export et Partage**
+  - Export au format JSON avec mise en forme propre
+  - Copie rapide vers le presse-papiers
+  - Prévisualisation du prompt formaté
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## 🚀 Technologies
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+- **Frontend**
+  - Vue.js 3 avec Composition API
+  - Tailwind CSS pour le style
+  - Animations fluides et transitions
+  - Interface responsive et moderne
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+- **Backend**
+  - Laravel
+  - API RESTful
+  - Gestion efficace des états
 
-## Laravel Sponsors
+## 💎 Design
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+- **Interface Utilisateur**
+  - Thème clair et professionnel
+  - Composants modulaires et réutilisables
+  - Animations subtiles pour une meilleure expérience utilisateur
+  - Boutons stylisés et cohérents
 
-### Premium Partners
+- **Organisation**
+  - Layout à deux colonnes (messages + sidebar)
+  - Sidebar sticky avec sélecteur de prompt et variables
+  - Modal d'export élégant et fonctionnel
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+## 🛠️ Installation
 
-## Contributing
+1. Cloner le repository :
+```bash
+git clone [url-du-repo]
+cd prompt-manager
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+2. Installer les dépendances :
+```bash
+composer install
+npm install
+```
+
+3. Configurer l'environnement :
+```bash
+cp .env.example .env
+php artisan key:generate
+```
+
+4. Lancer le serveur de développement :
+```bash
+php artisan serve
+npm run dev
+```
+
+## 📦 Structure des Composants
+
+- **Index.vue** : Composant principal
+  - Gestion de l'état global
+  - Organisation du layout
+  - Coordination des sous-composants
+
+- **Composants**
+  - **PromptItem** : Gestion individuelle des messages
+  - **PromptSelector** : Sélection du prompt actif
+  - **VariablesList** : Affichage et insertion des variables
+  - **ExportModal** : Export et copie du prompt
+
+## 🎨 Personnalisation
+
+L'application utilise Tailwind CSS avec une configuration personnalisée incluant :
+- Palette de couleurs primaires
+- Composants de boutons réutilisables
+- Animations et transitions
+- Police système optimisée
+
+## 📝 Contribution
+
+Les contributions sont les bienvenues ! N'hésitez pas à :
+1. Fork le projet
+2. Créer une branche pour votre fonctionnalité
+3. Commit vos changements
+4. Push sur votre fork
+5. Créer une Pull Request
 
 ## Code of Conduct
 
@@ -56,6 +114,6 @@ In order to ensure that the Laravel community is welcoming to all, please review
 
 If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
 
-## License
+## 📄 Licence
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Ce projet est sous licence MIT - voir le fichier [LICENSE.md](LICENSE.md) pour plus de détails.
