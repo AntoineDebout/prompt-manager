@@ -22,19 +22,24 @@
             leave-from="opacity-100 scale-100"
             leave-to="opacity-0 scale-95"
           >
-            <DialogPanel class="w-full max-w-2xl transform overflow-hidden rounded-2xl bg-white p-6 shadow-xl transition-all">
-              <DialogTitle as="h3" class="text-lg font-medium leading-6 text-gray-900">
+            <DialogPanel class="w-full max-w-4xl transform overflow-hidden rounded-2xl bg-white p-6 shadow-xl transition-all">
+              <DialogTitle as="h3" class="text-xl font-semibold leading-6 text-gray-900 mb-1">
                 Export du Prompt
               </DialogTitle>
+              <p class="text-sm text-gray-500 mb-4">
+                Le prompt est exporté au format JSON pour pouvoir être importé dans d'autres outils.
+              </p>
               <div class="mt-4">
-                <pre class="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-auto max-h-96"><code>{{ JSON.stringify(content, null, 2) }}</code></pre>
+                <pre class="bg-gray-900 text-gray-100 p-6 rounded-lg overflow-y-auto max-h-[60vh] text-sm font-mono whitespace-pre-wrap break-all"><code>{{ JSON.stringify(content, null, 2) }}</code></pre>
               </div>
-              <div class="mt-4 flex justify-end">
+              <div class="mt-6 flex justify-end gap-3">
                 <button
                   @click="copyToClipboard"
-                  class="btn btn-primary mr-2"
-                  :class="{ 'opacity-50': copied }"
+                  class="btn btn-primary inline-flex items-center gap-2"
                 >
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                  </svg>
                   {{ copied ? 'Copié !' : 'Copier' }}
                 </button>
                 <button
@@ -53,8 +58,8 @@
 </template>
 
 <script setup>
-import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
 import { ref } from 'vue'
+import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
 
 const props = defineProps({
   modelValue: {
@@ -67,16 +72,14 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['update:modelValue'])
+defineEmits(['update:modelValue'])
 
-// Variable pour suivre l'état de la copie
 const copied = ref(false)
 
 const copyToClipboard = async () => {
   try {
     await navigator.clipboard.writeText(JSON.stringify(props.content, null, 2))
     copied.value = true
-    // Réinitialiser le message après 2 secondes
     setTimeout(() => {
       copied.value = false
     }, 2000)

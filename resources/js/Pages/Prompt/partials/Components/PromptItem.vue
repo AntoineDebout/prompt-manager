@@ -5,7 +5,7 @@
       <div class="w-48">
         <select
           v-model="modelValue.role"
-          class="w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+          class="w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 py-2.5 px-3 text-sm"
           @change="$emit('update:modelValue', { ...modelValue, role: $event.target.value })"
         >
           <option value="system">System</option>
@@ -20,7 +20,7 @@
           v-model="modelValue.content"
           v-auto-resize
           :data-index="index"
-          class="w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 min-h-[6rem]"
+          class="w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 min-h-[6rem] px-4 py-2"
           @dragover.prevent
           @drop="handleDrop"
           @click="$event.target.focus()"
@@ -190,3 +190,9 @@ const insertVariable = (variable, position) => {
   })
 }
 </script>
+
+<style>
+select option {
+  padding: 8px 12px;
+}
+</style>
