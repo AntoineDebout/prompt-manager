@@ -229,6 +229,8 @@ const handleTextareaFocus = (index) => {
 // Computed avec les labels
 const extractVariablesWithLabels = computed(() => {
   const variablesMap = new Map()
+  
+  // Collecte des variables depuis les prompts
   promptItems.value.forEach(item => {
     const matches = item.content.match(/{{([^}]+)}}/g)
     if (matches) {
@@ -243,7 +245,11 @@ const extractVariablesWithLabels = computed(() => {
       })
     }
   })
-  return Array.from(variablesMap.values())
+  
+  // Conversion en tableau et tri par label
+  return Array.from(variablesMap.values()).sort((a, b) => {
+    return a.label.localeCompare(b.label, 'fr', { sensitivity: 'base' })
+  })
 })
 
 // Méthodes
