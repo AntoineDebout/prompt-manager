@@ -89,26 +89,24 @@ const selectedPromptSlug = ref(Object.keys(props.templatePrompts)[0])
 const isExportModalOpen = ref(false)
 const activeTextareaIndex = ref(null)
 
+// État local pour les prompts
+const localPrompts = ref({ ...props.templatePrompts })
+
 // Computed pour le prompt actuel
 const currentPromptItems = computed({
-  get: () => props.templatePrompts[selectedPromptSlug.value] || [],
+  get: () => localPrompts.value[selectedPromptSlug.value] || [],
   set: (newValue) => {
-    // On crée une copie de l'objet pour maintenir la réactivité
-    const updatedPrompts = { ...props.templatePrompts }
-    updatedPrompts[selectedPromptSlug.value] = newValue
-    // Ici, vous pourriez ajouter une logique pour sauvegarder les changements
+    localPrompts.value[selectedPromptSlug.value] = [...newValue]
   }
 })
 
 // Méthodes
 
 const addNewItem = () => {
-  const newPrompt = [...currentPromptItems.value]
-  newPrompt.push({
-    role: 'system',
+  currentPromptItems.value.push({
     content: '',
-  })
-  currentPromptItems.value = newPrompt
+    role: 'system'
+  });
 }
 
 const deleteItem = (index) => {
