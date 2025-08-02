@@ -9,71 +9,18 @@
           <!-- Liste des prompts -->
           <div class="space-y-4">
             <TransitionGroup name="list">
-              <div
+              <PromptItem
                 v-for="(item, index) in promptItems"
                 :key="index"
-                class="bg-white rounded-lg p-4 border border-gray-200 hover:border-primary-300 transition-all duration-200"
-              >
-                <div class="flex items-start gap-4">
-                  <!-- Sélection du rôle -->
-                  <div class="w-48">
-                    <select
-                      v-model="item.role"
-                      class="w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
-                    >
-                      <option value="system">System</option>
-                      <option value="developer">Developer</option>
-                      <option value="user">User</option>
-                    </select>
-                  </div>
-
-                  <!-- Zone de texte -->
-                  <div class="flex-1">
-                    <textarea
-                      v-model="item.content"
-                      v-auto-resize
-                      :data-index="index"
-                      class="w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 min-h-[6rem]"
-                      @dragover.prevent
-                      @drop="handleDrop($event, index)"
-                      @click="$event.target.focus()"
-                      @focus="handleTextareaFocus(index)"
-                      @input="handleTextareaInput($event, index)"
-                      @keydown="handleTextareaKeydown($event, index)"
-                    ></textarea>
-                  </div>
-
-                  <!-- Boutons d'actions -->
-                  <div class="flex flex-col gap-2">
-                    <button
-                      @click="moveItem(index, index - 1)"
-                      :disabled="index === 0"
-                      class="p-2 text-gray-500 hover:text-primary-600 disabled:opacity-50"
-                    >
-                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
-                      </svg>
-                    </button>
-                    <button
-                      @click="deleteItem(index)"
-                      class="p-2 text-red-500 hover:text-red-600"
-                    >
-                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                      </svg>
-                    </button>
-                    <button
-                      @click="moveItem(index, index + 1)"
-                      :disabled="index === promptItems.length - 1"
-                      class="p-2 text-gray-500 hover:text-primary-600 disabled:opacity-50"
-                    >
-                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                      </svg>
-                    </button>
-                  </div>
-                </div>
-              </div>
+                v-model="promptItems[index]"
+                :index="index"
+                :is-first="index === 0"
+                :is-last="index === promptItems.length - 1"
+                @move-up="moveItem(index, index - 1)"
+                @move-down="moveItem(index, index + 1)"
+                @delete="deleteItem(index)"
+                @focus="activeTextareaIndex = index"
+              />
             </TransitionGroup>
           </div>
 
@@ -95,118 +42,27 @@
           </div>
         </div>
 
-        <!-- Card des variables (1/4) -->
-        <div class="w-1/4">
-          <div class="bg-white rounded-lg border border-gray-200 p-4 sticky top-8">
-            <h2 class="text-lg font-medium text-gray-700 mb-3">Variables disponibles</h2>
-            <div class="flex flex-wrap gap-2">
-              <div
-                v-for="variable in extractVariablesWithLabels"
-                :key="variable.key"
-                class="px-3 py-1.5 bg-primary-50 text-primary-700 rounded-md border border-primary-200 cursor-pointer select-none"
-                draggable="true"
-                @dragstart="handleDragStart($event, variable)"
-                @dblclick="handleVariableClick(variable)"
-              >
-                {{ variable.label }}
-              </div>
-            </div>
-          </div>
-        </div>
+        <!-- Liste des variables -->
+        <VariablesList
+          @variable-click="handleVariableClick"
+        />
       </div>
     </div>
 
     <!-- Modal d'export -->
-    <TransitionRoot appear :show="isExportModalOpen" as="template">
-      <Dialog as="div" @close="isExportModalOpen = false" class="relative z-10">
-        <TransitionChild
-          enter="duration-300 ease-out"
-          enter-from="opacity-0"
-          enter-to="opacity-100"
-          leave="duration-200 ease-in"
-          leave-from="opacity-100"
-          leave-to="opacity-0"
-        >
-          <div class="fixed inset-0 bg-black/25" />
-        </TransitionChild>
-
-        <div class="fixed inset-0 overflow-y-auto">
-          <div class="flex min-h-full items-center justify-center p-4">
-            <TransitionChild
-              enter="duration-300 ease-out"
-              enter-from="opacity-0 scale-95"
-              enter-to="opacity-100 scale-100"
-              leave="duration-200 ease-in"
-              leave-from="opacity-100 scale-100"
-              leave-to="opacity-0 scale-95"
-            >
-              <DialogPanel class="w-full max-w-2xl transform overflow-hidden rounded-2xl bg-white p-6 shadow-xl transition-all">
-                <DialogTitle as="h3" class="text-lg font-medium leading-6 text-gray-900">
-                  Export du Prompt
-                </DialogTitle>
-                <div class="mt-4">
-                  <pre class="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-auto max-h-96"><code>{{ JSON.stringify(promptItems, null, 2) }}</code></pre>
-                </div>
-                <div class="mt-4 flex justify-end">
-                  <button
-                    @click="copyToClipboard"
-                    class="btn btn-primary mr-2"
-                  >
-                    Copier
-                  </button>
-                  <button
-                    @click="isExportModalOpen = false"
-                    class="btn btn-outline"
-                  >
-                    Fermer
-                  </button>
-                </div>
-              </DialogPanel>
-            </TransitionChild>
-          </div>
-        </div>
-      </Dialog>
-    </TransitionRoot>
+    <ExportModal
+      v-model="isExportModalOpen"
+      :content="promptItems"
+    />
   </div>
 </template>
 
 <script setup>
-import { ref, computed, nextTick, onMounted } from 'vue'
-import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
-import { getVariableLabel, getVariableKey } from './partials/config/variables.js'
-
-// Directive pour auto-resize
-const vAutoResize = {
-  mounted: (el) => {
-    el.style.overflow = 'hidden'
-    el.style.resize = 'none'
-    
-    const resize = () => {
-      el.style.height = 'auto'
-      el.style.height = el.scrollHeight + 'px'
-    }
-    
-    el.addEventListener('input', resize)
-    window.addEventListener('resize', resize)
-    
-    // Initial resize
-    nextTick(resize)
-    
-    // Cleanup
-    el._cleanup = () => {
-      window.removeEventListener('resize', resize)
-    }
-  },
-  updated: (el) => {
-    nextTick(() => {
-      el.style.height = 'auto'
-      el.style.height = el.scrollHeight + 'px'
-    })
-  },
-  unmounted: (el) => {
-    if (el._cleanup) el._cleanup()
-  }
-}
+import { ref, computed } from 'vue'
+import { getVariableLabel } from './partials/config/variables.js'
+import PromptItem from './partials/Components/PromptItem.vue'
+import VariablesList from './partials/Components/VariablesList.vue'
+import ExportModal from './partials/Components/ExportModal.vue'
 
 // Props
 const props = defineProps({
@@ -221,36 +77,7 @@ const promptItems = ref([...props.templatePrompt])
 const isExportModalOpen = ref(false)
 const activeTextareaIndex = ref(null)
 
-// Suivre le textarea actif
-const handleTextareaFocus = (index) => {
-  activeTextareaIndex.value = index
-}
-
-// Computed avec les labels
-const extractVariablesWithLabels = computed(() => {
-  const variablesMap = new Map()
-  
-  // Collecte des variables depuis les prompts
-  promptItems.value.forEach(item => {
-    const matches = item.content.match(/{{([^}]+)}}/g)
-    if (matches) {
-      matches.forEach(match => {
-        const key = match.trim()
-        if (!variablesMap.has(key)) {
-          variablesMap.set(key, {
-            key: key,
-            label: getVariableLabel(key)
-          })
-        }
-      })
-    }
-  })
-  
-  // Conversion en tableau et tri par label
-  return Array.from(variablesMap.values()).sort((a, b) => {
-    return a.label.localeCompare(b.label, 'fr', { sensitivity: 'base' })
-  })
-})
+// Plus besoin de extractVariablesWithLabels car les variables sont maintenant gérées directement dans le composant VariablesList
 
 // Méthodes
 const addNewItem = () => {
@@ -270,11 +97,6 @@ const moveItem = (fromIndex, toIndex) => {
   promptItems.value.splice(toIndex, 0, item)
 }
 
-const handleDragStart = (event, variable) => {
-  event.dataTransfer.setData('text/plain', variable.key)
-  event.dataTransfer.setData('text/label', variable.label)
-}
-
 const handleVariableClick = (variable) => {
   if (activeTextareaIndex.value !== null) {
     const textarea = document.querySelector(`textarea[data-index="${activeTextareaIndex.value}"]`)
@@ -291,79 +113,10 @@ const insertVariable = (variable, index, position) => {
   
   const textToInsert = (needsSpaceBefore ? ' ' : '') + variable + (needsSpaceAfter ? ' ' : '')
   promptItems.value[index].content = content.substring(0, position) + textToInsert + content.substring(position)
-  
-  // Mettre à jour la position du curseur après l'insertion
-  nextTick(() => {
-    const newPosition = position + textToInsert.length
-    const textarea = document.querySelector(`textarea[data-index="${index}"]`)
-    if (textarea) {
-      textarea.focus()
-      textarea.setSelectionRange(newPosition, newPosition)
-    }
-  })
-}
-
-const handleDrop = (event, index) => {
-  event.preventDefault()
-  const variable = event.dataTransfer.getData('text/plain')
-  const textarea = event.target
-  insertVariable(variable, index, textarea.selectionStart)
 }
 
 const exportPrompt = () => {
   isExportModalOpen.value = true
-}
-
-const copyToClipboard = async () => {
-  try {
-    await navigator.clipboard.writeText(JSON.stringify(promptItems.value, null, 2))
-    // On pourrait ajouter une notification de succès ici
-  } catch (err) {
-    console.error('Failed to copy: ', err)
-  }
-}
-
-// Fonction pour empêcher la modification des variables
-const handleTextareaKeydown = (event, index) => {
-  const textarea = event.target;
-  const cursorPos = textarea.selectionStart;
-  const content = promptItems.value[index].content;
-
-  // Recherche des variables dans le texte
-  const variablePattern = /{{([^}]+)}}/g;
-  const matches = [...content.matchAll(variablePattern)];
-  
-  // Vérifie si le curseur est dans une variable
-  for (const match of matches) {
-    const start = match.index;
-    const end = start + match[0].length;
-    
-    if (cursorPos >= start && cursorPos <= end) {
-      // Si c'est la touche supprimer ou retour arrière
-      if (event.key === 'Backspace' || event.key === 'Delete') {
-        event.preventDefault();
-        // Supprime toute la variable
-        const beforeVariable = content.substring(0, start);
-        const afterVariable = content.substring(end);
-        promptItems.value[index].content = beforeVariable + afterVariable;
-        
-        // Replace le curseur au début de où était la variable
-        nextTick(() => {
-          textarea.selectionStart = textarea.selectionEnd = start;
-        });
-      } else {
-        // Empêche toute autre modification
-        event.preventDefault();
-      }
-      return;
-    }
-  }
-}
-
-// Simplification de handleTextareaInput pour ne garder que la mise à jour du v-model
-const handleTextareaInput = (event, index) => {
-  const newValue = event.target.value;
-  promptItems.value[index].content = newValue;
 }
 </script>
 
@@ -382,29 +135,5 @@ const handleTextareaInput = (event, index) => {
 
 .list-leave-active {
   position: absolute;
-}
-
-/* Ajout d'un style pour la scrollbar des variables */
-.overflow-y-auto {
-  scrollbar-width: thin;
-  scrollbar-color: #E5E7EB transparent;
-}
-
-.overflow-y-auto::-webkit-scrollbar {
-  width: 6px;
-}
-
-.overflow-y-auto::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.overflow-y-auto::-webkit-scrollbar-thumb {
-  background-color: #E5E7EB;
-  border-radius: 3px;
-}
-
-/* Style pour une transition plus fluide du sticky */
-.sticky {
-  transition: all 0.2s ease;
 }
 </style>
