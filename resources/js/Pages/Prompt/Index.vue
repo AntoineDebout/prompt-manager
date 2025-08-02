@@ -46,9 +46,9 @@
                 <div class="flex-1">
                   <textarea
                     v-model="item.content"
-                    rows="4"
+                    v-auto-resize
                     :data-index="index"
-                    class="w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                    class="w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 min-h-[6rem]"
                     @dragover.prevent
                     @drop="handleDrop($event, index)"
                     @click="$event.target.focus()"
@@ -166,8 +166,41 @@
 </template>
 
 <script setup>
-import { ref, computed, nextTick } from 'vue'
+import { ref, computed, nextTick, onMounted } from 'vue'
 import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
+
+// Directive pour auto-resize
+const vAutoResize = {
+  mounted: (el) => {
+    el.style.overflow = 'hidden'
+    el.style.resize = 'none'
+    
+    const resize = () => {
+      el.style.height = 'auto'
+      el.style.height = el.scrollHeight + 'px'
+    }
+    
+    el.addEventListener('input', resize)
+    window.addEventListener('resize', resize)
+    
+    // Initial resize
+    nextTick(resize)
+    
+    // Cleanup
+    el._cleanup = () => {
+      window.removeEventListener('resize', resize)
+    }
+  },
+  updated: (el) => {
+    nextTick(() => {
+      el.style.height = 'auto'
+      el.style.height = el.scrollHeight + 'px'
+    })
+  },
+  unmounted: (el) => {
+    if (el._cleanup) el._cleanup()
+  }
+}
 
 // Props
 const props = defineProps({
