@@ -7,15 +7,16 @@
         <!-- Variables disponibles -->
         <div class="mb-8">
           <h2 class="text-lg font-medium text-gray-700 mb-3">Variables disponibles</h2>
-          <div class="flex flex-wrap gap-2">              <div
-              v-for="variable in extractVariables"
-              :key="variable"
+          <div class="flex flex-wrap gap-2">
+            <div
+              v-for="variable in extractVariablesWithLabels"
+              :key="variable.key"
               class="px-3 py-1.5 bg-primary-50 text-primary-700 rounded-md border border-primary-200 cursor-pointer select-none"
               draggable="true"
               @dragstart="handleDragStart($event, variable)"
               @dblclick="handleVariableClick(variable)"
             >
-              {{ variable }}
+              {{ variable.label }}
             </div>
           </div>
         </div>
@@ -168,6 +169,7 @@
 <script setup>
 import { ref, computed, nextTick, onMounted } from 'vue'
 import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
+import { getVariableLabel, getVariableKey } from './partials/config/variables.js'
 
 // Directive pour auto-resize
 const vAutoResize = {
@@ -220,27 +222,24 @@ const handleTextareaFocus = (index) => {
   activeTextareaIndex.value = index
 }
 
-const handleVariableClick = (variable) => {
-  if (activeTextareaIndex.value !== null) {
-    const textarea = document.querySelector(`textarea[data-index="${activeTextareaIndex.value}"]`)
-    if (textarea) {
-      insertVariable(variable, activeTextareaIndex.value, textarea.selectionStart)
-    }
-  }
-}
-
-// Computed
-const extractVariables = computed(() => {
-  const variables = new Set()
+// Computed avec les labels
+const extractVariablesWithLabels = computed(() => {
+  const variablesMap = new Map()
   promptItems.value.forEach(item => {
-    const matches = item.content.match(/{{(.*?)}}/g)
+    const matches = item.content.match(/{{([^}]+)}}/g)
     if (matches) {
       matches.forEach(match => {
-        variables.add(match.trim())
+        const key = match.trim()
+        if (!variablesMap.has(key)) {
+          variablesMap.set(key, {
+            key: key,
+            label: getVariableLabel(key)
+          })
+        }
       })
     }
   })
-  return Array.from(variables)
+  return Array.from(variablesMap.values())
 })
 
 // Méthodes
@@ -262,7 +261,17 @@ const moveItem = (fromIndex, toIndex) => {
 }
 
 const handleDragStart = (event, variable) => {
-  event.dataTransfer.setData('text/plain', variable)
+  event.dataTransfer.setData('text/plain', variable.key)
+  event.dataTransfer.setData('text/label', variable.label)
+}
+
+const handleVariableClick = (variable) => {
+  if (activeTextareaIndex.value !== null) {
+    const textarea = document.querySelector(`textarea[data-index="${activeTextareaIndex.value}"]`)
+    if (textarea) {
+      insertVariable(variable.key, activeTextareaIndex.value, textarea.selectionStart)
+    }
+  }
 }
 
 const insertVariable = (variable, index, position) => {
