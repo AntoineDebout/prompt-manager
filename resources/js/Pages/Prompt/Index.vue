@@ -7,13 +7,13 @@
         <!-- Variables disponibles -->
         <div class="mb-8">
           <h2 class="text-lg font-medium text-gray-700 mb-3">Variables disponibles</h2>
-          <div class="flex flex-wrap gap-2">
-            <div
+          <div class="flex flex-wrap gap-2">              <div
               v-for="variable in extractVariables"
               :key="variable"
-              class="px-3 py-1.5 bg-primary-50 text-primary-700 rounded-md border border-primary-200 cursor-move"
+              class="px-3 py-1.5 bg-primary-50 text-primary-700 rounded-md border border-primary-200 cursor-pointer select-none"
               draggable="true"
               @dragstart="handleDragStart($event, variable)"
+              @dblclick="handleVariableClick(variable)"
             >
               {{ variable }}
             </div>
@@ -47,9 +47,12 @@
                   <textarea
                     v-model="item.content"
                     rows="4"
+                    :data-index="index"
                     class="w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
                     @dragover.prevent
                     @drop="handleDrop($event, index)"
+                    @click="$event.target.focus()"
+                    @focus="handleTextareaFocus(index)"
                   ></textarea>
                 </div>
 
@@ -161,7 +164,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, nextTick } from 'vue'
 import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
 
 // Props
@@ -175,6 +178,21 @@ const props = defineProps({
 // État local
 const promptItems = ref([...props.templatePrompt])
 const isExportModalOpen = ref(false)
+const activeTextareaIndex = ref(null)
+
+// Suivre le textarea actif
+const handleTextareaFocus = (index) => {
+  activeTextareaIndex.value = index
+}
+
+const handleVariableClick = (variable) => {
+  if (activeTextareaIndex.value !== null) {
+    const textarea = document.querySelector(`textarea[data-index="${activeTextareaIndex.value}"]`)
+    if (textarea) {
+      insertVariable(variable, activeTextareaIndex.value, textarea.selectionStart)
+    }
+  }
+}
 
 // Computed
 const extractVariables = computed(() => {
@@ -212,13 +230,30 @@ const handleDragStart = (event, variable) => {
   event.dataTransfer.setData('text/plain', variable)
 }
 
+const insertVariable = (variable, index, position) => {
+  const content = promptItems.value[index].content
+  const needsSpaceBefore = position > 0 && content[position - 1] !== ' '
+  const needsSpaceAfter = position < content.length && content[position] !== ' '
+  
+  const textToInsert = (needsSpaceBefore ? ' ' : '') + variable + (needsSpaceAfter ? ' ' : '')
+  promptItems.value[index].content = content.substring(0, position) + textToInsert + content.substring(position)
+  
+  // Mettre à jour la position du curseur après l'insertion
+  nextTick(() => {
+    const newPosition = position + textToInsert.length
+    const textarea = document.querySelector(`textarea[data-index="${index}"]`)
+    if (textarea) {
+      textarea.focus()
+      textarea.setSelectionRange(newPosition, newPosition)
+    }
+  })
+}
+
 const handleDrop = (event, index) => {
+  event.preventDefault()
   const variable = event.dataTransfer.getData('text/plain')
   const textarea = event.target
-  const start = textarea.selectionStart
-  const end = textarea.selectionEnd
-  const content = promptItems.value[index].content
-  promptItems.value[index].content = content.substring(0, start) + variable + content.substring(end)
+  insertVariable(variable, index, textarea.selectionStart)
 }
 
 const exportPrompt = () => {
