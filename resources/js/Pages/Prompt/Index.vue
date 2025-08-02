@@ -53,6 +53,8 @@
                     @drop="handleDrop($event, index)"
                     @click="$event.target.focus()"
                     @focus="handleTextareaFocus(index)"
+                    @input="handleTextareaInput($event, index)"
+                    @keydown="handleTextareaKeydown($event, index)"
                   ></textarea>
                 </div>
 
@@ -267,6 +269,49 @@ const copyToClipboard = async () => {
   } catch (err) {
     console.error('Failed to copy: ', err)
   }
+}
+
+// Fonction pour empêcher la modification des variables
+const handleTextareaKeydown = (event, index) => {
+  const textarea = event.target;
+  const cursorPos = textarea.selectionStart;
+  const content = promptItems.value[index].content;
+
+  // Recherche des variables dans le texte
+  const variablePattern = /{{([^}]+)}}/g;
+  const matches = [...content.matchAll(variablePattern)];
+  
+  // Vérifie si le curseur est dans une variable
+  for (const match of matches) {
+    const start = match.index;
+    const end = start + match[0].length;
+    
+    if (cursorPos >= start && cursorPos <= end) {
+      // Si c'est la touche supprimer ou retour arrière
+      if (event.key === 'Backspace' || event.key === 'Delete') {
+        event.preventDefault();
+        // Supprime toute la variable
+        const beforeVariable = content.substring(0, start);
+        const afterVariable = content.substring(end);
+        promptItems.value[index].content = beforeVariable + afterVariable;
+        
+        // Replace le curseur au début de où était la variable
+        nextTick(() => {
+          textarea.selectionStart = textarea.selectionEnd = start;
+        });
+      } else {
+        // Empêche toute autre modification
+        event.preventDefault();
+      }
+      return;
+    }
+  }
+}
+
+// Simplification de handleTextareaInput pour ne garder que la mise à jour du v-model
+const handleTextareaInput = (event, index) => {
+  const newValue = event.target.value;
+  promptItems.value[index].content = newValue;
 }
 </script>
 
