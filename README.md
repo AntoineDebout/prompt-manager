@@ -2,6 +2,10 @@
 
 Une application construite avec Laravel, Vue.js et Tailwind CSS pour gérer et organiser vos prompts d'IA de manière efficace.
 
+<img width="1427" height="866" alt="Capture d’écran 2025-08-03 à 01 42 38" src="https://github.com/user-attachments/assets/0fa2b261-0c33-483d-b56c-669ce4b30ed3" />
+
+<img width="1427" height="867" alt="Capture d’écran 2025-08-03 à 01 42 55" src="https://github.com/user-attachments/assets/545c10f9-8367-4e56-b7a7-323f0c06d3d2" />
+
 ## 🌟 Fonctionnalités
 
 - **Gestion Multi-prompts**
