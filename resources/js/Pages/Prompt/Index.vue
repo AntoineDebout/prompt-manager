@@ -21,7 +21,7 @@
                 @move-up="moveItem(index, index - 1)"
                 @move-down="moveItem(index, index + 1)"
                 @delete="deleteItem(index)"
-
+                @test="openTestModal(item)"
               />
             </TransitionGroup>
           </div>
@@ -35,12 +35,21 @@
               Ajouter un message
             </button>
 
-            <button
-              @click="exportPrompt"
-              class="btn btn-outline"
-            >
-              Exporter le prompt
-            </button>
+            <div class="space-x-3">
+              <button
+                @click="openTestModalForCurrentPrompt"
+                class="btn btn-outline"
+              >
+                Tester le prompt
+              </button>
+
+              <button
+                @click="exportPrompt"
+                class="btn btn-outline"
+              >
+                Exporter le prompt
+              </button>
+            </div>
           </div>
         </div>
 
@@ -66,6 +75,12 @@
       v-model="isExportModalOpen"
       :content="currentPromptItems"
     />
+
+    <TestPromptModal
+      v-model="showTestModal"
+      :prompt="selectedPrompt?.content"
+      :variables="promptVariables"
+    />
   </div>
 </template>
 
@@ -75,6 +90,7 @@ import PromptItem from './partials/Components/PromptItem.vue'
 import PromptSelector from './partials/Components/PromptSelector.vue'
 import VariablesList from './partials/Components/VariablesList.vue'
 import ExportModal from './partials/Components/ExportModal.vue'
+import TestPromptModal from './partials/Components/TestPromptModal.vue'
 
 // Props
 const props = defineProps({
@@ -127,6 +143,39 @@ const moveItem = (fromIndex, toIndex) => {
 
 const exportPrompt = () => {
   isExportModalOpen.value = true
+}
+
+const showTestModal = ref(false)
+const selectedPrompt = ref(null)
+const promptVariables = ref({})
+
+const openTestModalForCurrentPrompt = () => {
+  // Créer un "faux" prompt qui contient le contenu complet
+  const fullPrompt = {
+    content: currentPromptItems.value.map(item => item.content).join('\n\n')
+  }
+  openTestModal(fullPrompt)
+}
+
+const openTestModal = (prompt) => {
+  selectedPrompt.value = prompt
+  promptVariables.value = extractVariables(prompt.content)
+  showTestModal.value = true
+}
+
+const closeTestModal = () => {
+  showTestModal.value = false
+  selectedPrompt.value = null
+  promptVariables.value = {}
+}
+
+const extractVariables = (content) => {
+  const matches = content.match(/\{\{([^}]+)\}\}/g) || []
+  return matches.reduce((acc, match) => {
+    const key = match.replace(/[{}]/g, '')
+    acc[key] = ''
+    return acc
+  }, {})
 }
 </script>
 

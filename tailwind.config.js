@@ -16,6 +16,12 @@ export default {
             fontFamily: {
                 sans: ['Inter var', ...defaultTheme.fontFamily.sans],
             },
+            maxWidth: {
+                '8xl': '88rem', // ~1408px
+            },
+            width: {
+                '8xl': '88rem', // ~1408px
+            },
             colors: {
                 primary: {
                     50: '#f0f9ff',

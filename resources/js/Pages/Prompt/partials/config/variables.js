@@ -5,6 +5,7 @@ export const variableLabels = {
   '{{question_suggestion}}': 'Suggestion de réponse',
   '{{question_language}}': 'Langue de la question',
   '{{question_support_material}}': 'Matériel de support',
+  '{{question_cecrl_code}}': 'Question CECRL',
   '{{user_input}}': 'Réponse de l\'utilisateur'
 }
 

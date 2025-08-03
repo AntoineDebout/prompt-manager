@@ -1,7 +1,6 @@
 <?php
 
 return [
-
     /*
     |--------------------------------------------------------------------------
     | Third Party Services
@@ -35,4 +34,7 @@ return [
         ],
     ],
 
+    'openai' => [
+        'api_key' => env('OPENAI_API_KEY'),
+    ],
 ];
