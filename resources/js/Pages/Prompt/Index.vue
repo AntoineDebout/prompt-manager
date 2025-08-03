@@ -21,7 +21,7 @@
                 @move-up="moveItem(index, index - 1)"
                 @move-down="moveItem(index, index + 1)"
                 @delete="deleteItem(index)"
-                @focus="activeTextareaIndex = index"
+
               />
             </TransitionGroup>
           </div>
@@ -54,7 +54,7 @@
             />
             <!-- Liste des variables -->
             <VariablesList
-              @variable-click="handleVariableClick"
+
             />
           </div>
         </div>
@@ -87,7 +87,7 @@ const props = defineProps({
 // État local
 const selectedPromptSlug = ref(Object.keys(props.templatePrompts)[0])
 const isExportModalOpen = ref(false)
-const activeTextareaIndex = ref(null)
+
 
 // État local pour les prompts
 const localPrompts = ref({ ...props.templatePrompts })
@@ -123,25 +123,7 @@ const moveItem = (fromIndex, toIndex) => {
   currentPromptItems.value = newPrompt
 }
 
-const handleVariableClick = (variable) => {
-  if (activeTextareaIndex.value !== null) {
-    const textarea = document.querySelector(`textarea[data-index="${activeTextareaIndex.value}"]`)
-    if (textarea) {
-      insertVariable(variable.key, activeTextareaIndex.value, textarea.selectionStart)
-    }
-  }
-}
 
-const insertVariable = (variable, index, position) => {
-  const newPrompt = [...currentPromptItems.value]
-  const content = newPrompt[index].content
-  const needsSpaceBefore = position > 0 && content[position - 1] !== ' '
-  const needsSpaceAfter = position < content.length && content[position] !== ' '
-  
-  const textToInsert = (needsSpaceBefore ? ' ' : '') + variable + (needsSpaceAfter ? ' ' : '')
-  newPrompt[index].content = content.substring(0, position) + textToInsert + content.substring(position)
-  currentPromptItems.value = newPrompt
-}
 
 const exportPrompt = () => {
   isExportModalOpen.value = true

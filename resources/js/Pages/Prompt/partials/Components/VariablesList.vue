@@ -8,7 +8,6 @@
         class="px-3 py-2 text-sm text-gray-700 bg-white hover:bg-gray-50 rounded border border-gray-300 cursor-pointer text-center transition-colors duration-150 ease-in-out"
         draggable="true"
         @dragstart="handleDragStart($event, variable)"
-        @dblclick="$emit('variable-click', variable)"
       >
         {{ variable.label }}
       </button>
@@ -27,7 +26,7 @@ const availableVariables = computed(() => {
     .sort((a, b) => a.label.localeCompare(b.label, 'fr', { sensitivity: 'base' }))
 })
 
-defineEmits(['variable-click'])
+
 
 const handleDragStart = (event, variable) => {
   event.dataTransfer.setData('text/plain', variable.key)

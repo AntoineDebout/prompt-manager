@@ -23,8 +23,6 @@
           class="w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 min-h-[6rem] px-4 py-2"
           @dragover.prevent
           @drop="handleDrop"
-          @click="$event.target.focus()"
-          @focus="$emit('focus', index)"
           @input="handleInput"
           @keydown="handleKeydown"
         ></textarea>
@@ -169,21 +167,33 @@ const handleKeydown = (event) => {
   }
 }
 
+
 const insertVariable = (variable, position) => {
   const content = props.modelValue.content
-  const needsSpaceBefore = position > 0 && content[position - 1] !== ' '
-  const needsSpaceAfter = position < content.length && content[position] !== ' '
+  const charBefore = position > 0 ? content[position - 1] : ''
   
-  const textToInsert = (needsSpaceBefore ? ' ' : '') + variable + (needsSpaceAfter ? ' ' : '')
-  const newContent = content.substring(0, position) + textToInsert + content.substring(position)
+  // Ajouter un espace avant si nécessaire
+  const needsSpaceBefore = position > 0 && !/\s/.test(charBefore)
+  const spacePrefix = needsSpaceBefore ? ' ' : ''
   
+  // Toujours ajouter un espace après la variable
+  const fullVariable = spacePrefix + variable + ' '
+  const beforeInsert = content.substring(0, position)
+  const afterInsert = content.substring(position)
+  
+  // Créer le nouveau contenu
+  const newContent = beforeInsert + fullVariable + afterInsert
+  
+  // Calculer la nouvelle position avant d'émettre la mise à jour
+  const newPosition = position + fullVariable.length
+  
+  // Mettre à jour le contenu
   emit('update:modelValue', { ...props.modelValue, content: newContent })
   
   // Mettre à jour la position du curseur après l'insertion
   nextTick(() => {
     const textarea = document.querySelector(`textarea[data-index="${props.index}"]`)
     if (textarea) {
-      const newPosition = position + textToInsert.length
       textarea.focus()
       textarea.setSelectionRange(newPosition, newPosition)
     }
