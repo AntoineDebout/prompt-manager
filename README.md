@@ -30,6 +30,11 @@ Une application construite avec Laravel, Vue.js et Tailwind CSS pour gérer et o
   - Export au format JSON avec mise en forme propre
   - Copie rapide vers le presse-papiers
   - Prévisualisation du prompt formaté
+ 
+- **Modale de test du prompt**
+  - Possibilité de régler la température et le LLM de OpenAI
+  - Formulaire avec toutes les variables à saisir pour les tests
+  - Possibilité d'avoir des cas de tests pré-remplis
 
 ## 🚀 Technologies
 
