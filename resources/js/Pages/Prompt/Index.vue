@@ -159,7 +159,7 @@ const openTestModalForCurrentPrompt = () => {
 
 const openTestModal = (prompt) => {
   selectedPrompt.value = prompt
-  promptVariables.value = extractVariables(prompt.content)
+  promptVariables.value = getDefaultVariables()
   showTestModal.value = true
 }
 
@@ -169,11 +169,13 @@ const closeTestModal = () => {
   promptVariables.value = {}
 }
 
-const extractVariables = (content) => {
-  const matches = content.match(/\{\{([^}]+)\}\}/g) || []
-  return matches.reduce((acc, match) => {
-    const key = match.replace(/[{}]/g, '')
-    acc[key] = ''
+import { variableLabels } from './partials/config/variables'
+
+const getDefaultVariables = () => {
+  return Object.keys(variableLabels).reduce((acc, key) => {
+    // Enlever les accolades de la clé
+    const cleanKey = key.replace(/[{}]/g, '')
+    acc[cleanKey] = ''
     return acc
   }, {})
 }

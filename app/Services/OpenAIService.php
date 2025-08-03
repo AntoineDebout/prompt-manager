@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Http;
 
 class OpenAIService
 {
-    public function testPrompt(string $prompt, array $variables, string $model = 'gpt-4o-mini', float $temperature = 0.7): string
+    public function testPrompt(string $prompt, array $variables, string $model = 'gpt-4o-mini', float $temperature = 0): string
     {
         $response = Http::withHeaders([
             'Authorization' => 'Bearer ' . config('services.openai.api_key'),

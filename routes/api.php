@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\PromptTestingController;
+use App\Http\Controllers\Api\PromptTestCasesController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -15,3 +16,4 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::post('/prompts/test', PromptTestingController::class)->name('api.prompts.test');
+Route::get('/prompts/test-cases', [PromptTestCasesController::class, 'index'])->name('api.prompts.test-cases');

@@ -42,23 +42,56 @@
 
               <form @submit.prevent="testPrompt" class="p-8">
                 <div class="space-y-8">
+                  <!-- Sélecteur de cas de test -->
+                  <div class="bg-gray-50 rounded-lg p-6 space-y-6">
+                    <h3 class="font-medium text-gray-900 flex items-center">
+                      <BeakerIcon class="h-5 w-5 mr-2 text-gray-500" />
+                      Cas de test
+                    </h3>
+                    <div class="flex gap-4 items-center">
+                      <div class="relative">
+                      <select
+                        id="testCase"
+                        v-model="selectedTestCase"
+                        class="mt-1 block w-64 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-base appearance-none px-4 py-3"
+                        @change="applyTestCase"
+                      >
+                        <option value="">Sélectionnez un cas de test</option>
+                        <option v-for="(testCase, id) in testCases" :key="id" :value="id">
+                          {{ id }}
+                        </option>
+                      </select>
+                      <ChevronDownIcon class="h-5 w-5 text-gray-400 absolute right-3 top-3.5 pointer-events-none" />
+                    </div>
+                      <button
+                        type="button"
+                        class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                        @click="resetFields"
+                      >
+                        <ArrowPathIcon class="h-4 w-4 mr-1.5" />
+                        Réinitialiser
+                      </button>
+                    </div>
+                  </div>
+
                   <!-- Variables du prompt -->
-                  <div v-if="Object.keys(variables).length > 0" class="bg-gray-50 rounded-lg p-6 space-y-6">
+                  <div v-if="Object.keys(props.variables).length > 0" class="bg-gray-50 rounded-lg p-6 space-y-6">
                     <h3 class="font-medium text-gray-900 flex items-center">
                       <AdjustmentsHorizontalIcon class="h-5 w-5 mr-2 text-gray-500" />
                       Variables
                     </h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                      <div v-for="(value, key) in variables" :key="key" class="space-y-2">
+                      <div v-for="(value, key) in props.variables" :key="key" class="space-y-2">
                         <label :for="key" class="block text-sm font-medium text-gray-700">{{ computeLabel(key) }}</label>
                         <input
                           :id="key"
                           :name="key"
-                          v-model="variables[key]"
+                          v-model="props.variables[key]"
                           type="text"
                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-base px-4 py-3"
-                          :placeholder="key"
+                          @focus="clearFieldError(key)"
                         />
+                        <p v-if="fieldErrors[key]" class="mt-1 text-sm text-red-600">{{ fieldErrors[key] }}</p>
                       </div>
                     </div>
                   </div>
@@ -178,11 +211,12 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { Dialog, DialogPanel, TransitionRoot, TransitionChild } from '@headlessui/vue'
+import { ref, onMounted } from 'vue'
+import { Dialog, DialogPanel, TransitionChild, TransitionRoot } from '@headlessui/vue'
 import { 
   BeakerIcon, 
   XMarkIcon, 
+  ArrowPathIcon,
   AdjustmentsHorizontalIcon,
   Cog6ToothIcon,
   ChevronDownIcon,
@@ -192,7 +226,7 @@ import {
   SparklesIcon
 } from '@heroicons/vue/24/outline'
 import axios from 'axios'
-import { variableLabels, getVariableLabel } from '../config/variables'
+import { variableLabels } from '../config/variables'
 
 const props = defineProps({
   modelValue: Boolean,
@@ -205,18 +239,80 @@ const props = defineProps({
 
 const emit = defineEmits(['update:modelValue'])
 
+const form = ref({
+  model: 'gpt-4o-mini',
+  temperature: 0.0
+})
+
+const result = ref('')
+const error = ref('')
+const isLoading = ref(false)
+const fieldErrors = ref({})
+const testCases = ref({})
+const selectedTestCase = ref('')
+const originalValues = ref({})
+
+// Charger les cas de test
+const loadTestCases = async () => {
+  try {
+    const response = await axios.get('/api/prompts/test-cases')
+    testCases.value = response.data
+  } catch (error) {
+    console.error('Erreur lors du chargement des cas de test:', error)
+  }
+}
+
+// Appliquer le cas de test sélectionné
+const applyTestCase = () => {
+  if (!selectedTestCase.value) return
+  
+  const testCase = testCases.value[selectedTestCase.value]
+  if (!testCase) return
+
+  console.log('Variables disponibles:', Object.keys(props.variables))
+  console.log('Cas de test:', testCase)
+
+  // Sauvegarder les valeurs originales si pas encore fait
+  if (Object.keys(originalValues.value).length === 0) {
+    Object.keys(props.variables).forEach(key => {
+      originalValues.value[key] = props.variables[key]
+    })
+  }
+
+  // Appliquer les nouvelles valeurs
+  Object.keys(props.variables).forEach(key => {
+    if (key in testCase) {
+      props.variables[key] = testCase[key]
+    }
+  })
+}
+
+// Réinitialiser les champs
+const resetFields = () => {
+  selectedTestCase.value = ''
+  // Restaurer les valeurs originales
+  Object.keys(originalValues.value).forEach(key => {
+    if (key in props.variables) {
+      props.variables[key] = originalValues.value[key]
+    }
+  })
+}
+
 const resetModal = () => {
   result.value = ''
   error.value = ''
   fieldErrors.value = {}
   form.value = {
     model: 'gpt-4o-mini',
-    temperature: 0.7
+    temperature: 0.0
   }
   // Réinitialiser les variables
   Object.keys(props.variables).forEach(key => {
     props.variables[key] = ''
   })
+  // Réinitialiser le cas de test sélectionné
+  selectedTestCase.value = ''
+  originalValues.value = {}
 }
 
 const closeModal = () => {
@@ -224,15 +320,10 @@ const closeModal = () => {
   emit('update:modelValue', false)
 }
 
-const form = ref({
-  model: 'gpt-4o-mini',
-  temperature: 0.7
-})
-
-const result = ref('')
-const error = ref('')
-const isLoading = ref(false)
-const fieldErrors = ref({})
+const computeLabel = (key) => {
+  const fullKey = `{{${key}}}`
+  return variableLabels[fullKey] || key
+}
 
 const clearFieldError = (field) => {
   if (fieldErrors.value[field]) {
@@ -284,8 +375,8 @@ const copyToClipboard = async () => {
   }
 }
 
-const computeLabel = (key) => {
-  const fullKey = `{{${key}}}`
-  return variableLabels[fullKey] || key
-}
+// Charger les cas de test au montage du composant
+onMounted(() => {
+  loadTestCases()
+})
 </script>
