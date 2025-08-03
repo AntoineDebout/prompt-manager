@@ -7,23 +7,38 @@ use Illuminate\Support\Facades\Log;
 
 class OpenAIService
 {
-
-    public function testPrompt(array $messages, array $variables, string $model = 'gpt-4o-mini', float $temperature = 0): string
+    public function testPrompt(array $messages, array $variables, array $schema = null, string $model = 'gpt-4o-mini', float $temperature = 0): string
     {
         try {
-            $response = Http::withHeaders([
-                'Authorization' => 'Bearer ' . config('services.openai.api_key'),
-                'Content-Type' => 'application/json',
-            ])->post('https://api.openai.com/v1/chat/completions', [
+            $payload = [
                 'model' => $model,
                 'messages' => $this->processMessages($messages, $variables),
                 'temperature' => $temperature,
-            ]);
+            ];
+
+            if ($schema) {
+                $payload['functions'] = [
+                    [
+                        'name' => 'process_response',
+                        'description' => 'Process and structure the assistant\'s response',
+                        'parameters' => $schema['schema']
+                    ]
+                ];
+                $payload['function_call'] = ['name' => 'process_response'];
+            }
+
+            $response = Http::withHeaders([
+                'Authorization' => 'Bearer ' . config('services.openai.api_key'),
+                'Content-Type' => 'application/json',
+            ])->post('https://api.openai.com/v1/chat/completions', $payload);
 
             if (!$response->successful()) {
                 $error = $response->json('error.message') ?? $response->body();
-                
                 return response()->json(['error' => 'OpenAI API error: ' . $error]);
+            }
+
+            if ($schema) {
+                return $response->json('choices.0.message.function_call.arguments');
             }
 
             return $response->json('choices.0.message.content');

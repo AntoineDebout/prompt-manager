@@ -237,6 +237,10 @@ const props = defineProps({
   variables: {
     type: Object,
     default: () => ({})
+  },
+  schema: {
+    type: Object,
+    default: null
   }
 })
 
@@ -341,8 +345,9 @@ const testPrompt = async () => {
   
   try {
     const response = await axios.post('/api/prompts/test', {
-      messages: props.prompt, // Maintenant un tableau de messages
+      messages: props.prompt,
       variables: props.variables,
+      schema: props.schema, // Ajout du schéma JSON si présent
       model: form.value.model,
       temperature: parseFloat(form.value.temperature)
     })
