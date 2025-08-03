@@ -78,7 +78,7 @@
 
     <TestPromptModal
       v-model="showTestModal"
-      :prompt="selectedPrompt?.content"
+      :prompt="selectedPrompt?.messages"
       :variables="promptVariables"
     />
   </div>
@@ -150,11 +150,10 @@ const selectedPrompt = ref(null)
 const promptVariables = ref({})
 
 const openTestModalForCurrentPrompt = () => {
-  // Créer un "faux" prompt qui contient le contenu complet
-  const fullPrompt = {
-    content: currentPromptItems.value.map(item => item.content).join('\n\n')
-  }
-  openTestModal(fullPrompt)
+  // Envoyer le tableau de messages complet
+  openTestModal({
+    messages: currentPromptItems.value
+  })
 }
 
 const openTestModal = (prompt) => {

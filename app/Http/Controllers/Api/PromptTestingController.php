@@ -20,7 +20,7 @@ class PromptTestingController extends Controller
 
         try {
             $result = $this->openAIService->testPrompt(
-                $validated['prompt'],
+                $validated['messages'],
                 $validated['variables'],
                 $validated['model'],
                 (float) $validated['temperature']

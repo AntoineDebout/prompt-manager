@@ -230,7 +230,10 @@ import { variableLabels } from '../config/variables'
 
 const props = defineProps({
   modelValue: Boolean,
-  prompt: String,
+  prompt: {
+    type: Array,
+    default: () => []
+  },
   variables: {
     type: Object,
     default: () => ({})
@@ -338,7 +341,7 @@ const testPrompt = async () => {
   
   try {
     const response = await axios.post('/api/prompts/test', {
-      prompt: props.prompt,
+      messages: props.prompt, // Maintenant un tableau de messages
       variables: props.variables,
       model: form.value.model,
       temperature: parseFloat(form.value.temperature)
