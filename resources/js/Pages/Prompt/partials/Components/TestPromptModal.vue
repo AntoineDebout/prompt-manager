@@ -40,89 +40,89 @@
                 </div>
               </div>
 
-              <div class="flex h-[calc(85vh-4rem)]">
+              <div class="flex h-[calc(85vh-4rem)] w-full">
                 <!-- Panneau de gauche avec le formulaire -->
-                <form @submit.prevent="testPrompt" class="w-[70%] p-8 overflow-y-auto border-r">
+                <form @submit.prevent="testPrompt" class="flex-1 basis-0 max-w-[70%] p-8 overflow-y-auto border-r">
                   <div class="space-y-6 max-w-4xl mx-auto">
-                    <div class="grid grid-cols-2 gap-6">
-                      <!-- Sélecteur de cas de test -->
-                      <div class="bg-gray-50 rounded-lg p-6 space-y-4">
-                        <h3 class="font-medium text-gray-900 flex items-center">
-                          <BeakerIcon class="h-5 w-5 mr-2 text-gray-500" />
-                          Cas de test
-                        </h3>
-                        <div class="flex gap-4 items-center">
-                          <div class="relative flex-1">
-                            <select
-                              id="testCase"
-                              v-model="selectedTestCase"
-                              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm appearance-none pr-10 pl-3 py-2 truncate"
-                              @change="applyTestCase"
-                            >
-                              <option value="">Sélectionnez un cas de test</option>
-                              <option v-for="(testCase, id) in testCases" :key="id" :value="id">
-                                {{ id }}
-                              </option>
-                            </select>
-                            <ChevronDownIcon class="h-5 w-5 text-gray-400 absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none" />
-                          </div>
-                          <button
-                            type="button"
-                            class="inline-flex items-center p-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 shrink-0"
-                            @click="resetFields"
-                          >
-                            <ArrowPathIcon class="h-4 w-4" />
-                          </button>
-                        </div>
-                      </div>
-
-                      <!-- Configuration -->
-                      <div class="bg-gray-50 rounded-lg p-6 space-y-4">
-                        <h3 class="font-medium text-gray-900 flex items-center">
-                          <Cog6ToothIcon class="h-5 w-5 mr-2 text-gray-500" />
-                          Configuration
-                        </h3>
-                        <div class="grid grid-cols-2 gap-6">
-                          <!-- Sélection du modèle -->
-                          <div class="space-y-2">
-                            <label for="model" class="block text-sm font-medium text-gray-700">Modèle</label>
-                            <div class="relative">
+                    <div class="grid gap-6">
+                      <!-- Cas de test & Configuration côte à côte -->
+                      <div class="col-span-1 flex gap-6">
+                        <!-- Sélecteur de cas de test -->
+                        <div class="bg-gray-50 rounded-lg p-6 flex-1 w-full space-y-4">
+                          <h3 class="font-medium text-gray-900 flex items-center">
+                            <BeakerIcon class="h-5 w-5 mr-2 text-gray-500" />
+                            Cas de test
+                          </h3>
+                          <div class="flex gap-2 items-center">
+                            <div class="relative flex-1">
                               <select
-                                id="model"
-                                v-model="form.model"
+                                id="testCase"
+                                v-model="selectedTestCase"
                                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm appearance-none pr-10 pl-3 py-2 truncate"
+                                @change="applyTestCase"
                               >
-                                <option value="gpt-4o-mini">GPT-4o Mini</option>
-                                <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
-                                <option value="gpt-4">GPT-4</option>
-                                <option value="gpt-4-turbo">GPT-4 Turbo</option>
+                                <option value="">Sélectionnez un cas de test</option>
+                                <option v-for="(testCase, id) in testCases" :key="id" :value="id">
+                                  {{ id }}
+                                </option>
                               </select>
                               <ChevronDownIcon class="h-5 w-5 text-gray-400 absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none" />
                             </div>
+                            <button
+                              type="button"
+                              class="inline-flex items-center p-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 shrink-0"
+                              @click="resetFields"
+                            >
+                              <ArrowPathIcon class="h-4 w-4" />
+                            </button>
                           </div>
-
-                          <!-- Température -->
-                          <div class="space-y-2">
-                            <label for="temperature" class="block text-sm font-medium text-gray-700">
-                              Température
-                            </label>
-                            <div class="flex items-center space-x-4">
-                              <input
-                                id="temperature"
-                                v-model="form.temperature"
-                                type="range"
-                                min="0"
-                                max="2"
-                                step="0.1"
-                                class="flex-1"
-                              />
-                              <span class="text-sm text-gray-500 w-12 text-right">{{ form.temperature }}</span>
+                        </div>
+                        <!-- Configuration -->
+                        <div class="bg-gray-50 rounded-lg p-6 flex-1 w-full space-y-4">
+                          <h3 class="font-medium text-gray-900 flex items-center">
+                            <Cog6ToothIcon class="h-5 w-5 mr-2 text-gray-500" />
+                            Configuration
+                          </h3>
+                          <div class="grid grid-cols-2 gap-6">
+                            <!-- Sélection du modèle -->
+                            <div class="space-y-2">
+                              <label for="model" class="block text-sm font-medium text-gray-700">Modèle</label>
+                              <div class="relative">
+                                <select
+                                  id="model"
+                                  v-model="form.model"
+                                  class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm appearance-none pr-10 pl-3 py-2 truncate"
+                                >
+                                  <option value="gpt-4o-mini">GPT-4o Mini</option>
+                                  <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
+                                  <option value="gpt-4">GPT-4</option>
+                                  <option value="gpt-4-turbo">GPT-4 Turbo</option>
+                                </select>
+                                <ChevronDownIcon class="h-5 w-5 text-gray-400 absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none" />
+                              </div>
+                            </div>
+                            <!-- Température -->
+                            <div class="space-y-2">
+                              <label for="temperature" class="block text-sm font-medium text-gray-700">
+                                Température
+                              </label>
+                              <div class="flex items-center space-x-4">
+                                <input
+                                  id="temperature"
+                                  v-model="form.temperature"
+                                  type="range"
+                                  min="0"
+                                  max="2"
+                                  step="0.1"
+                                  class="flex-1"
+                                />
+                                <span class="text-sm text-gray-500 w-12 text-right">{{ form.temperature }}</span>
+                              </div>
                             </div>
                           </div>
                         </div>
                       </div>
                     </div>
-
                     <!-- Variables du prompt -->
                     <div v-if="Object.keys(props.variables).length > 0" class="bg-gray-50 rounded-lg p-6 space-y-6">
                       <h3 class="font-medium text-gray-900 flex items-center">
@@ -144,71 +144,69 @@
                         </div>
                       </div>
                     </div>
-
-                  <!-- Message d'erreur -->
-                  <div v-if="error" class="rounded-md bg-red-50 p-4">
-                    <div class="flex">
-                      <ExclamationCircleIcon class="h-5 w-5 text-red-400" />
-                      <div class="ml-3">
-                        <h3 class="text-sm font-medium text-red-800">Une erreur est survenue</h3>
-                        <div class="mt-2 text-sm text-red-700">{{ error }}</div>
+                    <!-- Message d'erreur -->
+                    <div v-if="error" class="rounded-md bg-red-50 p-4">
+                      <div class="flex">
+                        <ExclamationCircleIcon class="h-5 w-5 text-red-400" />
+                        <div class="ml-3">
+                          <h3 class="text-sm font-medium text-red-800">Une erreur est survenue</h3>
+                          <div class="mt-2 text-sm text-red-700">{{ error }}</div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="flex justify-end space-x-3 pt-4 border-t">
+                      <button
+                        type="button"
+                        class="inline-flex items-center justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                        @click="closeModal"
+                      >
+                        <XMarkIcon class="h-4 w-4 mr-1.5" />
+                        Fermer
+                      </button>
+                      <button
+                        type="submit"
+                        class="inline-flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                        :disabled="isLoading"
+                      >
+                        <BeakerIcon v-if="!isLoading" class="h-4 w-4 mr-1.5" />
+                        <SparklesIcon v-else class="h-4 w-4 mr-1.5 animate-spin" />
+                        {{ isLoading ? 'Test en cours...' : 'Tester' }}
+                      </button>
+                    </div>
+                  </div>
+                </form>
+                <!-- Panneau de droite avec le résultat -->
+                <div class="flex-1 basis-0 max-w-[30%] h-full flex flex-col bg-gray-50 p-8">
+                  <div class="flex items-center justify-between mb-4">
+                    <h3 class="font-medium text-gray-900 flex items-center">
+                      <DocumentTextIcon class="h-5 w-5 mr-2 text-gray-500" />
+                      Résultat
+                    </h3>
+                    <button
+                      type="button"
+                      class="text-sm text-gray-500 hover:text-gray-700"
+                      @click="copyToClipboard"
+                    >
+                      <div class="flex items-center">
+                        <DocumentDuplicateIcon class="h-4 w-4 mr-1" />
+                        Copier
+                      </div>
+                    </button>
+                  </div>
+                  <div class="flex-1 relative overflow-auto">
+                    <pre
+                      v-if="result"
+                      class="w-full h-full font-mono text-sm p-4 bg-white border border-gray-200 rounded-lg whitespace-pre-wrap"
+                    >{{ formattedResult }}</pre>
+                    <div v-else class="flex items-center justify-center h-full text-center text-gray-500">
+                      <div>
+                        <BeakerIcon class="h-12 w-12 mx-auto mb-4" />
+                        <p>Le résultat du test s'affichera ici</p>
                       </div>
                     </div>
                   </div>
-
-                  <div class="flex justify-end space-x-3 pt-4 border-t">
-                    <button
-                      type="button"
-                      class="inline-flex items-center justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                      @click="closeModal"
-                    >
-                      <XMarkIcon class="h-4 w-4 mr-1.5" />
-                      Fermer
-                    </button>
-                    <button
-                      type="submit"
-                      class="inline-flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                      :disabled="isLoading"
-                    >
-                      <BeakerIcon v-if="!isLoading" class="h-4 w-4 mr-1.5" />
-                      <SparklesIcon v-else class="h-4 w-4 mr-1.5 animate-spin" />
-                      {{ isLoading ? 'Test en cours...' : 'Tester' }}
-                    </button>
-                  </div>
-                </div>
-              </form>
-
-              <!-- Panneau de droite avec le résultat -->
-              <div v-if="result" class="w-[30%] flex flex-col bg-gray-50 p-8">
-                <div class="flex items-center justify-between mb-4">
-                  <h3 class="font-medium text-gray-900 flex items-center">
-                    <DocumentTextIcon class="h-5 w-5 mr-2 text-gray-500" />
-                    Résultat
-                  </h3>
-                  <button
-                    type="button"
-                    class="text-sm text-gray-500 hover:text-gray-700"
-                    @click="copyToClipboard"
-                  >
-                    <div class="flex items-center">
-                      <DocumentDuplicateIcon class="h-4 w-4 mr-1" />
-                      Copier
-                    </div>
-                  </button>
-                </div>
-                <div class="flex-1 relative overflow-auto">
-                  <pre
-                    class="w-full h-full font-mono text-sm p-4 bg-white border border-gray-200 rounded-lg whitespace-pre-wrap"
-                  >{{ formattedResult }}</pre>
                 </div>
               </div>
-              <div v-else class="w-[30%] flex items-center justify-center bg-gray-50">
-                <div class="text-center text-gray-500">
-                  <BeakerIcon class="h-12 w-12 mx-auto mb-4" />
-                  <p>Le résultat du test s'affichera ici</p>
-                </div>
-              </div>
-            </div>
           </DialogPanel>
           </TransitionChild>
         </div>
