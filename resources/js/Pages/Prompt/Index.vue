@@ -153,7 +153,7 @@ const isExportModalOpen = ref(false)
 // État local pour les prompts
 const localPrompts = ref({ ...props.templatePrompts })
 
-// Initialiser le store avec le schema par défaut lors du montage du composant
+// Initialize store with default schema on component mount
 store.dispatch('updateSchema', props.defaultSchema)
 
 // Computed pour le prompt actuel
