@@ -7,22 +7,26 @@ use Illuminate\Support\Facades\Log;
 
 class OpenAIService
 {
-
-    public function testPrompt(array $messages, array $variables, string $model = 'gpt-4o-mini', float $temperature = 0): string
+    public function testPrompt(array $messages, array $variables, array $schema, string $model = 'gpt-4o-mini', float $temperature = 0): string
     {
         try {
-            $response = Http::withHeaders([
-                'Authorization' => 'Bearer ' . config('services.openai.api_key'),
-                'Content-Type' => 'application/json',
-            ])->post('https://api.openai.com/v1/chat/completions', [
+            $payload = [
                 'model' => $model,
                 'messages' => $this->processMessages($messages, $variables),
                 'temperature' => $temperature,
-            ]);
+                'response_format' => [
+                    'type'  => 'json_schema',
+                    'json_schema' => $schema,
+                ]
+            ];
+
+            $response = Http::withHeaders([
+                'Authorization' => 'Bearer ' . config('services.openai.api_key'),
+                'Content-Type' => 'application/json',
+            ])->post('https://api.openai.com/v1/chat/completions', $payload);
 
             if (!$response->successful()) {
                 $error = $response->json('error.message') ?? $response->body();
-                
                 return response()->json(['error' => 'OpenAI API error: ' . $error]);
             }
 
@@ -35,7 +39,7 @@ class OpenAIService
                 'temperature' => $temperature
             ]);
 
-            return $response->json(['error' => 'Une erreur est survenue lors de l\'appel à OpenAI: ']);
+            return $response->json(['error' => 'Une erreur est survenue lors de l\'appel à OpenAI']);
         }
     }
 

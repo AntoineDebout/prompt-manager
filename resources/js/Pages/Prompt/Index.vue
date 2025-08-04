@@ -2,14 +2,43 @@
   <div class="min-h-screen bg-gray-50 py-8">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="mb-6">
-        <h1 class="text-2xl font-semibold text-gray-900">Gestionnaire de Prompts</h1>
+        <div class="flex justify-between items-center">
+          <h1 class="text-2xl font-semibold text-gray-900">Gestionnaire de Prompts</h1>
+          <div class="flex items-center space-x-3">
+            <span class="text-sm text-gray-500">Configuration du:</span>
+            <div class="flex items-center justify-between gap-2 px-1 py-1 bg-gray-100 rounded-lg">
+              <button
+                @click="currentView = 'prompt'"
+                type="button"
+                class="text-sm px-3 py-1.5 rounded-md transition-colors relative focus:outline-none"
+                :class="[
+                  currentView === 'prompt' 
+                    ? 'text-white bg-indigo-600 shadow-sm' 
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                ]"
+              >
+                Prompt
+              </button>
+              <button
+                @click="currentView = 'schema'"
+                type="button"
+                class="text-sm px-3 py-1.5 rounded-md transition-colors relative focus:outline-none"
+                :class="[
+                  currentView === 'schema' 
+                    ? 'text-white bg-indigo-600 shadow-sm' 
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                ]"
+              >
+                Schema
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
       
       <div class="flex gap-6">
-        <!-- Colonne principale - Messages (3/4) -->
         <div class="flex-1">
-          <!-- Liste des prompts -->
-          <div class="space-y-4">
+          <div v-if="currentView === 'prompt'" class="space-y-4 mb-6">
             <TransitionGroup name="list">
               <PromptItem
                 v-for="(item, index) in currentPromptItems"
@@ -26,19 +55,27 @@
             </TransitionGroup>
           </div>
 
-          <!-- Boutons d'action -->
-          <div class="mt-6 flex justify-between">
-            <button
-              @click="addNewItem"
-              class="btn btn-primary"
-            >
-              Ajouter un message
-            </button>
+          <div v-else-if="currentView === 'schema'" class="mb-6">
+            <JsonSchemaBuilder class="w-full" />
+          </div>
+
+          <!-- Boutons d'action toujours visibles -->
+          <div class="flex justify-between border-t pt-6">
+            <div>
+              <button
+                v-if="currentView === 'prompt'"
+                @click="addNewItem"
+                class="btn btn-primary"
+              >
+                Ajouter un message
+              </button>
+            </div>
 
             <div class="space-x-3">
               <button
                 @click="openTestModalForCurrentPrompt"
                 class="btn btn-outline"
+                :disabled="!canTest"
               >
                 Tester le prompt
               </button>
@@ -46,6 +83,7 @@
               <button
                 @click="exportPrompt"
                 class="btn btn-outline"
+                :disabled="!canTest"
               >
                 Exporter le prompt
               </button>
@@ -53,44 +91,45 @@
           </div>
         </div>
 
-        <!-- Sidebar droite -->
-        <div class="w-80 flex-none">
+        <div v-if="currentView === 'prompt'" class="w-80 flex-none">
           <div class="space-y-4 sticky top-8">
-            <!-- Sélecteur de prompt -->
             <PromptSelector
               v-model="selectedPromptSlug"
               :prompts="templatePrompts"
             />
-            <!-- Liste des variables -->
-            <VariablesList
-
-            />
+            <VariablesList />
           </div>
         </div>
       </div>
     </div>
-
-    <!-- Modal d'export -->
-    <ExportModal
-      v-model="isExportModalOpen"
-      :content="currentPromptItems"
-    />
-
-    <TestPromptModal
-      v-model="showTestModal"
-      :prompt="selectedPrompt?.messages"
-      :variables="promptVariables"
-    />
   </div>
+
+  <ExportModal 
+    v-model="isExportModalOpen"
+    :messages="currentPromptItems"
+    @close="closeExportModal"
+  />
+
+  <TestPromptModal
+    v-model="showTestModal"
+    :prompt="currentPromptItems"
+    :variables="promptVariables"
+    @close="closeTestModal"
+  />
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
+import { useStore } from 'vuex'
 import PromptItem from './partials/Components/PromptItem.vue'
 import PromptSelector from './partials/Components/PromptSelector.vue'
 import VariablesList from './partials/Components/VariablesList.vue'
 import ExportModal from './partials/Components/ExportModal.vue'
 import TestPromptModal from './partials/Components/TestPromptModal.vue'
+import JsonSchemaBuilder from './partials/Components/JsonSchemaBuilder.vue'
+
+// Store Vuex
+const store = useStore()
 
 // Props
 const props = defineProps({
@@ -98,15 +137,21 @@ const props = defineProps({
     type: Object,
     required: true,
   },
+  defaultSchema: {
+    type: Object,
+    required: true
+  }
 })
 
 // État local
 const selectedPromptSlug = ref(Object.keys(props.templatePrompts)[0])
 const isExportModalOpen = ref(false)
 
-
 // État local pour les prompts
 const localPrompts = ref({ ...props.templatePrompts })
+
+// Initialize store with default schema on component mount
+store.dispatch('updateSchema', props.defaultSchema)
 
 // Computed pour le prompt actuel
 const currentPromptItems = computed({
@@ -117,7 +162,6 @@ const currentPromptItems = computed({
 })
 
 // Méthodes
-
 const addNewItem = () => {
   currentPromptItems.value.push({
     content: '',
@@ -139,8 +183,6 @@ const moveItem = (fromIndex, toIndex) => {
   currentPromptItems.value = newPrompt
 }
 
-
-
 const exportPrompt = () => {
   isExportModalOpen.value = true
 }
@@ -149,15 +191,23 @@ const showTestModal = ref(false)
 const selectedPrompt = ref(null)
 const promptVariables = ref({})
 
+// Garde les boutons actifs selon la vue
+const canTest = computed(() => {
+  if (currentView.value === 'prompt') {
+    return currentPromptItems.value.length > 0
+  }
+  return true
+})
+
 const openTestModalForCurrentPrompt = () => {
-  // Envoyer le tableau de messages complet
-  openTestModal({
-    messages: currentPromptItems.value
-  })
+  promptVariables.value = getDefaultVariables()
+  showTestModal.value = true
 }
 
-const openTestModal = (prompt) => {
-  selectedPrompt.value = prompt
+const openTestModal = (item) => {
+  selectedPrompt.value = {
+    messages: [{ ...item }]
+  }
   promptVariables.value = getDefaultVariables()
   showTestModal.value = true
 }
@@ -166,6 +216,11 @@ const closeTestModal = () => {
   showTestModal.value = false
   selectedPrompt.value = null
   promptVariables.value = {}
+}
+
+// État local pour l'export
+const closeExportModal = () => {
+  isExportModalOpen.value = false
 }
 
 import { variableLabels } from './partials/config/variables'
@@ -178,6 +233,8 @@ const getDefaultVariables = () => {
     return acc
   }, {})
 }
+
+const currentView = ref('prompt')
 </script>
 
 <style scoped>

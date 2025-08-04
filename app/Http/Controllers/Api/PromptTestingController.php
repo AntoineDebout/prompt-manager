@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Services\OpenAIService;
 use Illuminate\Http\JsonResponse;
 use App\Http\Requests\PromptTestRequest;
+use Illuminate\Support\Facades\Log;
 
 class PromptTestingController extends Controller
 {
@@ -22,6 +23,7 @@ class PromptTestingController extends Controller
             $result = $this->openAIService->testPrompt(
                 $validated['messages'],
                 $validated['variables'],
+                $validated['schema'],
                 $validated['model'],
                 (float) $validated['temperature']
             );
