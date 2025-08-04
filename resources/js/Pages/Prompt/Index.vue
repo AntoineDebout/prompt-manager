@@ -143,9 +143,6 @@ const props = defineProps({
   }
 })
 
-// Initialiser le schema dans le store
-store.dispatch('updateSchema', props.defaultSchema)
-
 // État local
 const selectedPromptSlug = ref(Object.keys(props.templatePrompts)[0])
 const isExportModalOpen = ref(false)
