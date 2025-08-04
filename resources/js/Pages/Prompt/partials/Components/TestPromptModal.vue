@@ -22,7 +22,7 @@
             leave-from="opacity-100 scale-100"
             leave-to="opacity-0 scale-95"
           >
-            <DialogPanel class="w-8xl transform overflow-hidden rounded-2xl bg-white shadow-xl transition-all">
+            <DialogPanel class="w-[90vw] h-[85vh] transform overflow-hidden rounded-2xl bg-white shadow-xl transition-all">
               <div class="bg-gradient-to-r from-indigo-600 to-indigo-800 px-6 py-4">
                 <div class="flex items-center justify-between">
                   <div class="flex items-center">
@@ -40,135 +40,110 @@
                 </div>
               </div>
 
-              <form @submit.prevent="testPrompt" class="p-8">
-                <div class="space-y-8">
-                  <!-- Sélecteur de cas de test -->
-                  <div class="bg-gray-50 rounded-lg p-6 space-y-6">
-                    <h3 class="font-medium text-gray-900 flex items-center">
-                      <BeakerIcon class="h-5 w-5 mr-2 text-gray-500" />
-                      Cas de test
-                    </h3>
-                    <div class="flex gap-4 items-center">
-                      <div class="relative">
-                      <select
-                        id="testCase"
-                        v-model="selectedTestCase"
-                        class="mt-1 block w-64 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-base appearance-none px-4 py-3"
-                        @change="applyTestCase"
-                      >
-                        <option value="">Sélectionnez un cas de test</option>
-                        <option v-for="(testCase, id) in testCases" :key="id" :value="id">
-                          {{ id }}
-                        </option>
-                      </select>
-                      <ChevronDownIcon class="h-5 w-5 text-gray-400 absolute right-3 top-3.5 pointer-events-none" />
-                    </div>
-                      <button
-                        type="button"
-                        class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                        @click="resetFields"
-                      >
-                        <ArrowPathIcon class="h-4 w-4 mr-1.5" />
-                        Réinitialiser
-                      </button>
-                    </div>
-                  </div>
-
-                  <!-- Variables du prompt -->
-                  <div v-if="Object.keys(props.variables).length > 0" class="bg-gray-50 rounded-lg p-6 space-y-6">
-                    <h3 class="font-medium text-gray-900 flex items-center">
-                      <AdjustmentsHorizontalIcon class="h-5 w-5 mr-2 text-gray-500" />
-                      Variables
-                    </h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                      <div v-for="(value, key) in props.variables" :key="key" class="space-y-2">
-                        <label :for="key" class="block text-sm font-medium text-gray-700">{{ computeLabel(key) }}</label>
-                        <input
-                          :id="key"
-                          :name="key"
-                          v-model="props.variables[key]"
-                          type="text"
-                          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-base px-4 py-3"
-                          @focus="clearFieldError(key)"
-                        />
-                        <p v-if="fieldErrors[key]" class="mt-1 text-sm text-red-600">{{ fieldErrors[key] }}</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- Configuration -->
-                  <div class="bg-gray-50 rounded-lg p-6 space-y-6">
-                    <h3 class="font-medium text-gray-900 flex items-center">
-                      <Cog6ToothIcon class="h-5 w-5 mr-2 text-gray-500" />
-                      Configuration
-                    </h3>
-                    <div class="flex gap-6">
-                      <!-- Sélection du modèle -->
-                      <div class="space-y-2 flex-1">
-                        <label for="model" class="block text-sm font-medium text-gray-700">Modèle</label>
-                        <div class="relative">
-                          <select
-                            id="model"
-                            v-model="form.model"
-                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-base appearance-none px-4 py-3"
+              <div class="flex h-[calc(85vh-4rem)]">
+                <!-- Panneau de gauche avec le formulaire -->
+                <form @submit.prevent="testPrompt" class="w-[70%] p-8 overflow-y-auto border-r">
+                  <div class="space-y-6 max-w-4xl mx-auto">
+                    <div class="grid grid-cols-2 gap-6">
+                      <!-- Sélecteur de cas de test -->
+                      <div class="bg-gray-50 rounded-lg p-6 space-y-4">
+                        <h3 class="font-medium text-gray-900 flex items-center">
+                          <BeakerIcon class="h-5 w-5 mr-2 text-gray-500" />
+                          Cas de test
+                        </h3>
+                        <div class="flex gap-4 items-center">
+                          <div class="relative flex-1">
+                            <select
+                              id="testCase"
+                              v-model="selectedTestCase"
+                              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm appearance-none pr-10 pl-3 py-2 truncate"
+                              @change="applyTestCase"
+                            >
+                              <option value="">Sélectionnez un cas de test</option>
+                              <option v-for="(testCase, id) in testCases" :key="id" :value="id">
+                                {{ id }}
+                              </option>
+                            </select>
+                            <ChevronDownIcon class="h-5 w-5 text-gray-400 absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none" />
+                          </div>
+                          <button
+                            type="button"
+                            class="inline-flex items-center p-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 shrink-0"
+                            @click="resetFields"
                           >
-                            <option value="gpt-4o-mini">GPT-4o Mini</option>
-                            <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
-                            <option value="gpt-4">GPT-4</option>
-                            <option value="gpt-4-turbo">GPT-4 Turbo</option>
-                          </select>
-                          <ChevronDownIcon class="h-5 w-5 text-gray-400 absolute right-3 top-3.5 pointer-events-none" />
+                            <ArrowPathIcon class="h-4 w-4" />
+                          </button>
                         </div>
                       </div>
 
-                      <!-- Température -->
-                      <div class="space-y-2 flex-1">
-                        <label for="temperature" class="block text-sm font-medium text-gray-700">
-                          Température
-                        </label>
-                        <div class="flex items-center space-x-4">
-                          <input
-                            id="temperature"
-                            v-model="form.temperature"
-                            type="range"
-                            min="0"
-                            max="2"
-                            step="0.1"
-                            class="flex-1"
-                          />
-                          <span class="text-sm text-gray-500 w-12 text-right">{{ form.temperature }}</span>
+                      <!-- Configuration -->
+                      <div class="bg-gray-50 rounded-lg p-6 space-y-4">
+                        <h3 class="font-medium text-gray-900 flex items-center">
+                          <Cog6ToothIcon class="h-5 w-5 mr-2 text-gray-500" />
+                          Configuration
+                        </h3>
+                        <div class="grid grid-cols-2 gap-6">
+                          <!-- Sélection du modèle -->
+                          <div class="space-y-2">
+                            <label for="model" class="block text-sm font-medium text-gray-700">Modèle</label>
+                            <div class="relative">
+                              <select
+                                id="model"
+                                v-model="form.model"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm appearance-none pr-10 pl-3 py-2 truncate"
+                              >
+                                <option value="gpt-4o-mini">GPT-4o Mini</option>
+                                <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
+                                <option value="gpt-4">GPT-4</option>
+                                <option value="gpt-4-turbo">GPT-4 Turbo</option>
+                              </select>
+                              <ChevronDownIcon class="h-5 w-5 text-gray-400 absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none" />
+                            </div>
+                          </div>
+
+                          <!-- Température -->
+                          <div class="space-y-2">
+                            <label for="temperature" class="block text-sm font-medium text-gray-700">
+                              Température
+                            </label>
+                            <div class="flex items-center space-x-4">
+                              <input
+                                id="temperature"
+                                v-model="form.temperature"
+                                type="range"
+                                min="0"
+                                max="2"
+                                step="0.1"
+                                class="flex-1"
+                              />
+                              <span class="text-sm text-gray-500 w-12 text-right">{{ form.temperature }}</span>
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
 
-                  <!-- Résultat -->
-                  <div v-if="result" class="space-y-2">
-                    <div class="flex items-center justify-between">
+                    <!-- Variables du prompt -->
+                    <div v-if="Object.keys(props.variables).length > 0" class="bg-gray-50 rounded-lg p-6 space-y-6">
                       <h3 class="font-medium text-gray-900 flex items-center">
-                        <DocumentTextIcon class="h-5 w-5 mr-2 text-gray-500" />
-                        Résultat
+                        <AdjustmentsHorizontalIcon class="h-5 w-5 mr-2 text-gray-500" />
+                        Variables
                       </h3>
-                      <button
-                        type="button"
-                        class="text-sm text-gray-500 hover:text-gray-700"
-                        @click="copyToClipboard"
-                      >
-                        <div class="flex items-center">
-                          <DocumentDuplicateIcon class="h-4 w-4 mr-1" />
-                          Copier
+                      <div class="grid grid-cols-3 gap-6">
+                        <div v-for="(value, key) in props.variables" :key="key" class="space-y-2">
+                          <label :for="key" class="block text-sm font-medium text-gray-700">{{ computeLabel(key) }}</label>
+                          <input
+                            :id="key"
+                            :name="key"
+                            v-model="props.variables[key]"
+                            type="text"
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm px-3 py-2"
+                            @focus="clearFieldError(key)"
+                          />
+                          <p v-if="fieldErrors[key]" class="mt-1 text-sm text-red-600">{{ fieldErrors[key] }}</p>
                         </div>
-                      </button>
+                      </div>
                     </div>
-                    <div class="relative">
-                      <textarea
-                        v-model="result"
-                        readonly
-                        rows="6"
-                        class="mt-1 block w-full rounded-md bg-gray-50 border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm font-mono px-4 py-3"
-                      ></textarea>
-                    </div>
-                  </div>
 
                   <!-- Message d'erreur -->
                   <div v-if="error" class="rounded-md bg-red-50 p-4">
@@ -202,7 +177,39 @@
                   </div>
                 </div>
               </form>
-            </DialogPanel>
+
+              <!-- Panneau de droite avec le résultat -->
+              <div v-if="result" class="w-[30%] flex flex-col bg-gray-50 p-8">
+                <div class="flex items-center justify-between mb-4">
+                  <h3 class="font-medium text-gray-900 flex items-center">
+                    <DocumentTextIcon class="h-5 w-5 mr-2 text-gray-500" />
+                    Résultat
+                  </h3>
+                  <button
+                    type="button"
+                    class="text-sm text-gray-500 hover:text-gray-700"
+                    @click="copyToClipboard"
+                  >
+                    <div class="flex items-center">
+                      <DocumentDuplicateIcon class="h-4 w-4 mr-1" />
+                      Copier
+                    </div>
+                  </button>
+                </div>
+                <div class="flex-1 relative overflow-auto">
+                  <pre
+                    class="w-full h-full font-mono text-sm p-4 bg-white border border-gray-200 rounded-lg whitespace-pre-wrap"
+                  >{{ formattedResult }}</pre>
+                </div>
+              </div>
+              <div v-else class="w-[30%] flex items-center justify-center bg-gray-50">
+                <div class="text-center text-gray-500">
+                  <BeakerIcon class="h-12 w-12 mx-auto mb-4" />
+                  <p>Le résultat du test s'affichera ici</p>
+                </div>
+              </div>
+            </div>
+          </DialogPanel>
           </TransitionChild>
         </div>
       </div>
@@ -265,6 +272,22 @@ const form = ref({
 })
 
 const result = ref('')
+
+// Computed pour le formatage intelligent du résultat
+const formattedResult = computed(() => {
+  if (!result.value) return ''
+  
+  try {
+    // Essayer de parser comme JSON
+    const parsed = JSON.parse(result.value)
+    // Si c'est un JSON valide, le formater joliment
+    return JSON.stringify(parsed, null, 2)
+  } catch (e) {
+    // Si ce n'est pas du JSON, retourner tel quel
+    return result.value
+  }
+})
+
 const error = ref('')
 const isLoading = ref(false)
 const fieldErrors = ref({})
