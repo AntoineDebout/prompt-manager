@@ -7,7 +7,7 @@
           <div class="flex items-center gap-2">
             <button
               type="button"
-              class="text-sm text-gray-600 hover:text-gray-900"
+              class="text-sm text-gray-600 hover:text-gray-900 flex items-center"
               @click="formatSchema"
             >
               <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
