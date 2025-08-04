@@ -18,6 +18,8 @@ class PromptTestingController extends Controller
     {
         $validated = $request->validated();
 
+        dd($validated);
+
         try {
             $result = $this->openAIService->testPrompt(
                 $validated['messages'],

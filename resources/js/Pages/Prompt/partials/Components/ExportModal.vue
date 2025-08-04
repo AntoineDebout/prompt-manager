@@ -61,7 +61,9 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
+import { useStore } from 'vuex'
 
+const store = useStore()
 const props = defineProps({
   modelValue: {
     type: Boolean,
@@ -70,10 +72,6 @@ const props = defineProps({
   messages: {
     type: Array,
     required: true
-  },
-  schema: {
-    type: Object,
-    default: null
   }
 })
 
@@ -84,7 +82,7 @@ const copied = ref(false)
 const exportContent = computed(() => {
   const content = {
     messages: props.messages,
-    schema: props.schema
+    schema: store.state.schema.schema
   }
   return JSON.stringify(content, null, 2)
 })

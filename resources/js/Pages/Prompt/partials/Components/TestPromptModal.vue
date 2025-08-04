@@ -211,7 +211,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import { Dialog, DialogPanel, TransitionChild, TransitionRoot } from '@headlessui/vue'
 import { 
   BeakerIcon, 
@@ -227,7 +227,9 @@ import {
 } from '@heroicons/vue/24/outline'
 import axios from 'axios'
 import { variableLabels } from '../config/variables'
+import { useStore } from 'vuex'
 
+const store = useStore()
 const props = defineProps({
   modelValue: Boolean,
   prompt: {
@@ -237,11 +239,14 @@ const props = defineProps({
   variables: {
     type: Object,
     default: () => ({})
-  },
-  schema: {
-    type: Object,
-    default: null
   }
+})
+
+// Récupérer le schema depuis le store en utilisant le getter
+const schema = computed(() => {
+  const value = store.getters.rawSchema
+
+  return value
 })
 
 const emit = defineEmits(['update:modelValue'])
@@ -265,7 +270,7 @@ const loadTestCases = async () => {
     const response = await axios.get('/api/prompts/test-cases')
     testCases.value = response.data
   } catch (error) {
-    console.error('Erreur lors du chargement des cas de test:', error)
+    console.error('Erreur lors du chargement des cas de test:')
   }
 }
 
@@ -275,9 +280,6 @@ const applyTestCase = () => {
   
   const testCase = testCases.value[selectedTestCase.value]
   if (!testCase) return
-
-  console.log('Variables disponibles:', Object.keys(props.variables))
-  console.log('Cas de test:', testCase)
 
   // Sauvegarder les valeurs originales si pas encore fait
   if (Object.keys(originalValues.value).length === 0) {
@@ -344,10 +346,15 @@ const testPrompt = async () => {
   isLoading.value = true
   
   try {
+    const currentSchema = schema.value
+    if (!currentSchema) {
+      throw new Error('Schema non disponible')
+    }
+
     const response = await axios.post('/api/prompts/test', {
       messages: props.prompt,
       variables: props.variables,
-      schema: props.schema, // Ajout du schéma JSON si présent
+      schema: currentSchema,
       model: form.value.model,
       temperature: parseFloat(form.value.temperature)
     })

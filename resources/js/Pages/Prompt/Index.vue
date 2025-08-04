@@ -56,10 +56,7 @@
           </div>
 
           <div v-else-if="currentView === 'schema'" class="mb-6">
-            <JsonSchemaBuilder
-              v-model="schema"
-              class="w-full"
-            />
+            <JsonSchemaBuilder class="w-full" />
           </div>
 
           <!-- Boutons d'action toujours visibles -->
@@ -110,7 +107,6 @@
   <ExportModal 
     v-model="isExportModalOpen"
     :messages="currentPromptItems"
-    :schema="schema"
     @close="closeExportModal"
   />
 
@@ -118,19 +114,22 @@
     v-model="showTestModal"
     :messages="selectedPrompt?.messages"
     :variables="promptVariables"
-    :schema="schema"
     @close="closeTestModal"
   />
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
+import { useStore } from 'vuex'
 import PromptItem from './partials/Components/PromptItem.vue'
 import PromptSelector from './partials/Components/PromptSelector.vue'
 import VariablesList from './partials/Components/VariablesList.vue'
 import ExportModal from './partials/Components/ExportModal.vue'
 import TestPromptModal from './partials/Components/TestPromptModal.vue'
 import JsonSchemaBuilder from './partials/Components/JsonSchemaBuilder.vue'
+
+// Store Vuex
+const store = useStore()
 
 // Props
 const props = defineProps({
@@ -144,13 +143,18 @@ const props = defineProps({
   }
 })
 
+// Initialiser le schema dans le store
+store.dispatch('updateSchema', props.defaultSchema)
+
 // État local
 const selectedPromptSlug = ref(Object.keys(props.templatePrompts)[0])
 const isExportModalOpen = ref(false)
 
-
 // État local pour les prompts
 const localPrompts = ref({ ...props.templatePrompts })
+
+// Initialiser le store avec le schema par défaut lors du montage du composant
+store.dispatch('updateSchema', props.defaultSchema)
 
 // Computed pour le prompt actuel
 const currentPromptItems = computed({
@@ -161,7 +165,6 @@ const currentPromptItems = computed({
 })
 
 // Méthodes
-
 const addNewItem = () => {
   currentPromptItems.value.push({
     content: '',
@@ -183,8 +186,6 @@ const moveItem = (fromIndex, toIndex) => {
   currentPromptItems.value = newPrompt
 }
 
-
-
 const exportPrompt = () => {
   isExportModalOpen.value = true
 }
@@ -202,7 +203,6 @@ const canTest = computed(() => {
 })
 
 const openTestModalForCurrentPrompt = () => {
-  console.log('Opening test modal for current prompt')
   selectedPrompt.value = {
     messages: [...currentPromptItems.value]
   }
@@ -211,7 +211,6 @@ const openTestModalForCurrentPrompt = () => {
 }
 
 const openTestModal = (item) => {
-  console.log('Opening test modal for single item')
   selectedPrompt.value = {
     messages: [{ ...item }]
   }
@@ -242,7 +241,6 @@ const getDefaultVariables = () => {
 }
 
 const currentView = ref('prompt')
-const schema = ref(JSON.parse(JSON.stringify(props.defaultSchema)))
 </script>
 
 <style scoped>
