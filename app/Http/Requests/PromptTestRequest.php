@@ -21,8 +21,7 @@ class PromptTestRequest extends FormRequest
             'model' => ['required', 'string', 'in:gpt-4o-mini,gpt-3.5-turbo,gpt-4,gpt-4-turbo,gpt-4-turbo-preview'],
             'temperature' => ['required', 'numeric', 'between:0,2'],
             'variables' => ['required', 'array'],
-            'schema' => ['nullable', 'array'],
-            'schema.schema' => ['required_with:schema', 'array'],
+            'schema' => ['array'],
         ];
 
         // Validation dynamique des variables du prompt

@@ -242,11 +242,19 @@ const props = defineProps({
   }
 })
 
-// Récupérer le schema depuis le store en utilisant le getter
+// Computed pour le schema et les messages
 const schema = computed(() => {
   const value = store.getters.rawSchema
-
   return value
+})
+
+const messages = computed(() => {
+  return props.prompt || []
+})
+
+// Debug des valeurs au montage du composant
+onMounted(() => {
+  loadTestCases()
 })
 
 const emit = defineEmits(['update:modelValue'])
@@ -347,12 +355,18 @@ const testPrompt = async () => {
   
   try {
     const currentSchema = schema.value
+    const currentMessages = messages.value
+    
     if (!currentSchema) {
       throw new Error('Schema non disponible')
     }
 
+    if (!currentMessages?.length) {
+      throw new Error('Messages du prompt non disponibles')
+    }
+
     const response = await axios.post('/api/prompts/test', {
-      messages: props.prompt,
+      messages: currentMessages,
       variables: props.variables,
       schema: currentSchema,
       model: form.value.model,

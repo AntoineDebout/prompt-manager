@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Services\OpenAIService;
 use Illuminate\Http\JsonResponse;
 use App\Http\Requests\PromptTestRequest;
+use Illuminate\Support\Facades\Log;
 
 class PromptTestingController extends Controller
 {
@@ -17,8 +18,6 @@ class PromptTestingController extends Controller
     public function __invoke(PromptTestRequest $request): JsonResponse
     {
         $validated = $request->validated();
-
-        dd($validated);
 
         try {
             $result = $this->openAIService->testPrompt(

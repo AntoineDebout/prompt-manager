@@ -82,7 +82,7 @@ const copied = ref(false)
 const exportContent = computed(() => {
   const content = {
     messages: props.messages,
-    schema: store.state.schema.schema
+    schema: store.state.schema
   }
   return JSON.stringify(content, null, 2)
 })

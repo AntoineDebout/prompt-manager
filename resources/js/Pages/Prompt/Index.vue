@@ -112,7 +112,7 @@
 
   <TestPromptModal
     v-model="showTestModal"
-    :messages="selectedPrompt?.messages"
+    :prompt="currentPromptItems"
     :variables="promptVariables"
     @close="closeTestModal"
   />
@@ -203,9 +203,6 @@ const canTest = computed(() => {
 })
 
 const openTestModalForCurrentPrompt = () => {
-  selectedPrompt.value = {
-    messages: [...currentPromptItems.value]
-  }
   promptVariables.value = getDefaultVariables()
   showTestModal.value = true
 }
